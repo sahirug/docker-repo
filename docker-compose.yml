@@ -1,0 +1,43 @@
+version: "2"
+
+services:
+  tomcat:
+    container_name: my-tomcat
+    build: E:\Projects\Docker\Test3\docker-tomcat
+    ports:
+      - "8181:8080"
+    networks: 
+      my-net:
+        ipv4_address: 172.16.238.10
+  mysql:
+    container_name: my-db
+    image: mysql:5.7.15
+    ports:
+      - "3306:3306"
+    environment: 
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=accello      
+    networks: 
+      my-net:
+        ipv4_address: 172.16.238.11   
+  liquibase:
+    container_name: liquibase-container
+    build: E:/Projects/Docker/Test3/docker-liquibase
+    environment: 
+      - MYSQL_HOST=172.16.238.11
+      - MYSQL_PASSWORD=root
+      - TARGET_DATABASE=accello
+      - WAIT_HOSTS=172.16.238.11:3306
+    volumes:
+      - E:/Projects/Docker/Test3/docker-liquibase/migrations:/changelogs
+    networks: 
+      - my-net
+
+networks:
+  my-net:
+    driver: bridge
+    ipam: 
+      driver: default
+      config:
+      - subnet: "172.16.238.0/24"
+    
