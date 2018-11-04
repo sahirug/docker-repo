@@ -29,8 +29,4 @@ ENV LIQUIBASE_HOME /opt/liquibase
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
-RUN chmod +x /wait
-
-CMD /wait && update
 ENTRYPOINT ["/entrypoint.sh"]

@@ -1,4 +1,4 @@
-version: "2"
+version: "2.1"
 
 services:
   tomcat:
@@ -16,7 +16,11 @@ services:
       - "3306:3306"
     environment: 
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=accello      
+      - MYSQL_DATABASE=accello 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10       
     networks: 
       my-net:
         ipv4_address: 172.16.238.11   
@@ -30,8 +34,30 @@ services:
       - WAIT_HOSTS=172.16.238.11:3306
     volumes:
       - E:/Projects/Docker/Test3/docker-liquibase/migrations:/changelogs
+    depends_on: 
+      mysql:
+        condition: service_healthy  
     networks: 
       - my-net
+  nexus:   
+    container_name: nexus-container
+    image: sonatype/nexus3
+    ports:
+      - "8081:8081" 
+  camunda:
+    container_name: camunda-container
+    image: camunda/camunda-bpm-platform
+    ports:
+      - "8080:8080"    
+  logstash:
+    container_name: logstash-container
+    image: logstash
+  elasticsearch:
+    container_name: elasticsearch-container
+    image: elasticsearch:5.6.12
+    ports:
+      - "9200:9200"      
+
 
 networks:
   my-net:
